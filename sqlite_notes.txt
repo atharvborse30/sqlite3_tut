@@ -1,0 +1,190 @@
+sqlite commands - 
+CREATE TABLE STORE(STOREID INT, ITEMID INT, ITEM_NAME TEXT); - to create new table with column names and their datatypes.
+INSERT INTO STORE(STOREID, ITEMID, ITEM_NAME) VALUES (1,11,"Pen"); - to store values into the table
+INSERT INTO STORE VALUES (2,22,"Pencil"); - same as above
+SELECT * FROM STORE; - to retrieve the table data
+SELECT * FROM STORE WHERE STOREID = 1; - to retrieve only specific id's
+SELECT * FROM STORE WHERE ITEM_NAME = "Pen";
+SELECT * FROM STORE WHERE ITEM_NAME = "Pencil" AND ITEMID = 22;
+SELECT * FROM STORE WHERE ITEM_NAME = "Pencil" OR STOREID = 1;
+SELECT INVOICEID, COUNT(INVOICEID) FROM INVOICE GROUP BY INVOICEID;
+SELECT * FROM INVOICE ORDER BY INVOICEAMT DESC;
+SELECT * FROM INVOICE WHERE INVOICEAMT BETWEEN 1700 AND 5500;
+SELECT INVOICEID FROM INVOICE WHERE INVOICEID IN(10,50);
+UPDATE INVOICE SET INVOICENAMA = "Test" WHERE INVOICEID = 10 AND INVOICEAMT = 1500;
+
+date time :-
+SELECT DATE();
+SELECT TIME();
+SELECT DATETIME();
+
+primary key :-
+CREATE TABLE STUDENT(SID INT PRIMARY KEY, SNAME TEXT, SPHONE TEXT, SEMAIL TEXT);
+INSERT INTO STUDENT VALUES (1,"tom","123456789","test@gmail.com");
+SELECT * FROM STUDENT;
+
+not null value :-
+CREATE TABLE STUDENTNOTNULL1(SID INT PRIMARY KEY, SNAME TEXT NOT NULL);
+INSERT INTO STUDENTNOTNULL1 VALUES (2,"");
+
+unique constraint :-
+CREATE TABLE T1(TID INT UNIQUE NOT NULL, TNAME TEXT);
+
+default constraint :-
+CREATE TABLE T2(TID INT UNIQUE NOT NULL, TNAME TEXT DEFAULT 'Unknown');
+INSERT INTO T2(TID) VALUES(2);
+SELECT * FROM T2;
+
+check constraint :-
+CREATE TABLE T3(TID INT UNIQUE NOT NULL, TAMT REAL CHECK(TAMT > 900));
+INSERT INTO T3 VALUES(1, 950);
+sqlite> INSERT INTO T3 VALUES(1, 90);
+Error: CHECK constraint failed: T3
+
+alter table structure :-
+ALTER TABLE T3 ADD TNAME TEXT;
+SELECT * FROM T3;
+INSERT INTO T3 VALUES (3,1000,"HI");
+SELECT * FROM T3;
+
+rename column name :-
+ALTER TABLE T3 RENAME TNAME TO TNAME1;
+SELECT * FROM T3;
+
+rename table name from t3 to t3new :-
+sqlite> ALTER TABLE T3 RENAME TO T3NEW;
+sqlite> SELECT * FROM T3;
+Error: no such table: T3
+sqlite> SELECT * FROM T3NEW;
+TID|TAMT|TNAME1
+1|950.0|
+3|1000.0|HI
+
+
+drop a table :-
+sqlite> DROP TABLE T1;
+sqlite> SELECT * FROM T1;
+Error: no such table: T1
+
+drop a record from a table :-
+sqlite> select * from t3new;
+TID|TAMT|TNAME1
+1|950.0|
+3|1000.0|HI
+sqlite> delete from t3new where tid=3;
+sqlite> select * from t3new;
+TID|TAMT|TNAME1
+1|950.0|
+
+
+delete all record but not table :-
+sqlite> select * from t2;
+TID|TNAME
+1|Welcome
+2|Unknown
+sqlite> insert into t2 values(3,"hi");
+sqlite> insert into t2 values(4,"hello");
+sqlite> insert into t2 values(5,"welcome");
+sqlite> select * from t2;
+TID|TNAME
+1|Welcome
+2|Unknown
+3|hi
+4|hello
+5|welcome
+sqlite> delete from t2;
+sqlite> select * from t2;
+
+backup and restore of database/tables
+sqlite> .backup mydb_backup.db
+sqlite> .tables
+INVOICE          STUDENT          STUDENTNOTNULL1  T3NEW          
+STORE            STUDENTNOTNULL   T2             
+sqlite> drop table t2;
+sqlite> .schema t2
+sqlite> select * from t2;
+Error: no such table: t2
+sqlite> .restore mydb_backup.db
+sqlite> .tables
+INVOICE          STUDENT          STUDENTNOTNULL1  T3NEW          
+STORE            STUDENTNOTNULL   T2  
+
+various modes in sqlite :-
+sqlite> select * from invoice;
+INVOICEID|INVOICENAMA|INVOICEAMT
+10|invoice1|100
+20|invoice2|1500
+20|invoice3|2500
+30|invoice3|3500
+30|invoice4|4500
+sqlite> .mode csv
+sqlite> select * from invoice;
+INVOICEID,INVOICENAMA,INVOICEAMT
+10,invoice1,100
+20,invoice2,1500
+20,invoice3,2500
+30,invoice3,3500
+30,invoice4,4500
+sqlite> .mode insert
+sqlite> select * from invoice;
+INSERT INTO "table"(INVOICEID,INVOICENAMA,INVOICEAMT) VALUES(10,'invoice1',100);
+INSERT INTO "table"(INVOICEID,INVOICENAMA,INVOICEAMT) VALUES(20,'invoice2',1500);
+INSERT INTO "table"(INVOICEID,INVOICENAMA,INVOICEAMT) VALUES(20,'invoice3',2500);
+INSERT INTO "table"(INVOICEID,INVOICENAMA,INVOICEAMT) VALUES(30,'invoice3',3500);
+INSERT INTO "table"(INVOICEID,INVOICENAMA,INVOICEAMT) VALUES(30,'invoice4',4500);
+sqlite> .mode tab
+sqlite> select * from invoice;
+INVOICEID	INVOICENAMA	INVOICEAMT
+10	invoice1	100
+20	invoice2	1500
+20	invoice3	2500
+30	invoice3	3500
+30	invoice4	4500
+sqlite> .mode column
+sqlite> select * from invoice;
+INVOICEID   INVOICENAMA  INVOICEAMT
+----------  -----------  ----------
+10          invoice1     100       
+20          invoice2     1500      
+20          invoice3     2500      
+30          invoice3     3500      
+30          invoice4     4500      
+sqlite> .mode list
+sqlite> select * from invoice;
+INVOICEID|INVOICENAMA|INVOICEAMT
+10|invoice1|100
+20|invoice2|1500
+20|invoice3|2500
+30|invoice3|3500
+30|invoice4|4500
+
+save database explicitly :-
+sqlite> .save mydb.db
+Error: database is locked
+sqlite> .quit
+kpit1@LL-1191:~/Documents/py_tut/sqlite3_tutorial$ sqlite3
+SQLite version 3.31.1 2020-01-27 19:55:54
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+sqlite> .save mydb.db
+
+
+
+
+shell commands -
+sqlite3 mydb.db - to create new database
+.tables - to see the created tables
+.save STORE - to save the table STORE
+.save mydb - to save the database mydb
+.quit - to quit the sqlite 
+sqlite3 - to go and use sqlite 
+then .open mydb.db - to open the existing created db
+or just use sqlite3 mydb.db both
+.header on - to keep the header column on when showing data
+.schema - to see the structure of the tables
+.schema invoice - to access schema of just one table
+.backup mydb_backup.db - to take backup of the database
+.restore mydb_backup.db - to restore the deleted tables
+.mode list, .mode csv, .mode column, .mode insert, .mode tab
+
